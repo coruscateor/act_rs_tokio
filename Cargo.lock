@@ -5,15 +5,13 @@ version = 4
 [[package]]
 name = "act_rs"
 version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4adb2a24f112013f0e3d0c37dfa581a013234ecbc81f7d7741a0af59ac67870f"
 dependencies = [
  "async-trait",
 ]
 
 [[package]]
 name = "act_rs_tokio"
-version = "0.1.0"
+version = "0.2.0-alpha"
 dependencies = [
  "act_rs",
  "tokio",
@@ -36,9 +34,9 @@ checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 
 [[package]]
 name = "async-trait"
-version = "0.1.88"
+version = "0.1.89"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e539d3fca749fcee5236ab05e93a52867dd549cc157c8cb7f99595f3cedffdb5"
+checksum = "9035ad2d096bed7955a320ee7e2230574d28fd3c3a0f186cbea1ff3c7eed5dbb"
 dependencies = [
  "proc-macro2",
  "quote",

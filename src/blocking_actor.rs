@@ -5,7 +5,7 @@
 use tokio::task::JoinHandle;
 use std::{marker::PhantomData, sync::Arc, panic::UnwindSafe};
 
-use act_rs::ActorState;
+use act_rs::{ActorState, ActorStateBuilder};
 
 ///
 /// A blocking thread based actor.
@@ -21,9 +21,29 @@ impl BlockingActor
         where ST: ActorState + Send + 'static
     {
         
-        tokio::task::spawn_blocking(move || {
+        tokio::task::spawn_blocking(move ||
+        {
     
             BlockingActor::run(state);
+
+        })
+
+    }
+
+    pub fn spawn_and_build<ST, STB>(state_builder: STB) -> JoinHandle<()>
+        where ST: ActorState + Send + 'static,
+              STB: ActorStateBuilder<ST> + Send + 'static
+    {
+        
+        tokio::task::spawn_blocking(move ||
+        {
+
+            if let Some(state) = state_builder.build()
+            {
+
+                BlockingActor::run(state);
+
+            }      
 
         })
 

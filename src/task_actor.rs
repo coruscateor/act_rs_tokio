@@ -5,7 +5,7 @@ use tokio::task::{self, JoinHandle, spawn_blocking, JoinError};
 //use futures::{executor::block_on, FutureExt};
 use std::{marker::PhantomData, sync::Arc, panic::UnwindSafe};
 
-use act_rs::ActorStateAsync;
+use act_rs::{ActorStateAsync, ActorStateBuilderAsync};
 
 ///
 /// A task based actor.
@@ -21,9 +21,29 @@ impl TaskActor
         where ST: ActorStateAsync + Send + 'static
     {
         
-        tokio::spawn(async move {
+        tokio::spawn(async move
+        {
     
             TaskActor::run(state).await;
+
+        })
+
+    }
+
+    pub fn spawn_and_build<ST, STB>(state_builder: STB) -> JoinHandle<()>
+        where ST: ActorStateAsync + Send + 'static,
+              STB: ActorStateBuilderAsync<ST> + Send + 'static
+    {
+        
+        tokio::spawn(async move
+        {
+
+            if let Some(state) = state_builder.build_async().await
+            {
+
+                TaskActor::run(state).await;
+
+            }      
 
         })
 
