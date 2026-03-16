@@ -102,7 +102,7 @@ macro_rules! impl_mac_task_actor
  * Note that if build_async returns a None value then none of the run methods are called (including post_run_async).
 */
 #[macro_export]
-macro_rules! impl_mac_task_actor_built_state
+macro_rules! impl_mac_task_actor_with_state_builder
 {
 
     ($actor_type:ident) =>
@@ -118,42 +118,192 @@ macro_rules! impl_mac_task_actor_built_state
             impl $actor_type
             {
 
-                pub fn spawn(state_builder: [<$actor_type StateBuilder>]) -> JoinHandle<()>
+                pub fn spawn(state: [<$actor_type State>]) -> JoinHandle<()>
                 {
                     
                     tokio::spawn(async move {
 
-                        $actor_type::run(state_builder).await;
+                        $actor_type::run(state).await;
 
                     })
 
                 }
 
-                async fn run(mut state_builder: [<$actor_type StateBuilder>])
+                pub fn spawn_and_build(state_builder: [<$actor_type StateBuilder>]) -> JoinHandle<()>
                 {
-
-                    let mut opt_state = state_builder.build_async().await;
-
-                    if let Some(mut state) = opt_state
+                    
+                    tokio::spawn(async move
                     {
 
-                        let mut proceed = true; 
-                        
-                        if state.pre_run_async().await
+                        let mut opt_state = state_builder.build_async().await;
+
+                        if let Some(state) = opt_state
                         {
 
-                            while proceed
-                            {
-                                
-                                proceed = state.run_async().await;
-                    
-                            }
+                            $actor_type::run(state).await;
 
                         }
 
-                        state.post_run_async().await;
+                    })
+
+                }
+
+                async fn run(mut state: [<$actor_type State>])
+                {
+
+                    let mut proceed = true; 
+                    
+                    if state.pre_run_async().await
+                    {
+
+                        while proceed
+                        {
+                            
+                            proceed = state.run_async().await;
+                
+                        }
 
                     }
+
+                    state.post_run_async().await;
+
+                }
+
+            }
+            
+        }
+
+    }
+
+}
+
+//ActorFlow Compatible
+
+#[macro_export]
+macro_rules! impl_mac_task_actor_flexible
+{
+
+    ($actor_type:ident) =>
+    {
+
+        paste!
+        {
+
+            pub struct $actor_type
+            {
+            }
+
+            impl $actor_type
+            {
+
+                pub fn spawn(state: [<$actor_type State>]) -> JoinHandle<()>
+                {
+                    
+                    tokio::spawn(async move {
+
+                        $actor_type::run(state).await;
+
+                    })
+
+                }
+
+                async fn run(mut state: [<$actor_type State>])
+                {
+
+                    let mut proceed = true; 
+                    
+                    if state.pre_run_async().await.into()
+                    {
+
+                        while proceed
+                        {
+                            
+                            proceed = state.run_async().await.into()
+                
+                        }
+
+                    }
+
+                    state.post_run_async().await;
+
+                }
+
+            }
+            
+        }
+
+    }
+
+}
+
+
+
+#[macro_export]
+macro_rules! impl_mac_task_actor_with_state_builder_flexible
+{
+
+    ($actor_type:ident) =>
+    {
+
+        paste!
+        {
+
+            pub struct $actor_type
+            {
+            }
+
+            impl $actor_type
+            {
+
+                pub fn spawn(state: [<$actor_type State>]) -> JoinHandle<()>
+                {
+                    
+                    tokio::spawn(async move
+                    {
+
+                        $actor_type::run(state).await;
+
+                    })
+
+                }
+
+                pub fn spawn_and_build(state_builder: [<$actor_type StateBuilder>]) -> JoinHandle<()>
+                {
+                    
+                    tokio::spawn(async move
+                    {
+
+                        let mut opt_state = state_builder.build_async().await;
+
+                        if let Some(state) = opt_state
+                        {
+
+                            $actor_type::run(state).await;
+
+                        }
+
+                    })
+
+                }
+
+                async fn run(mut state: [<$actor_type State>])
+                {
+
+                    let mut proceed = true; 
+                    
+                    if state.pre_run_async().await.into()
+                    {
+
+                        while proceed
+                        {
+                            
+                            proceed = state.run_async().await.into();
+                
+                        }
+
+                    }
+
+                    state.post_run_async().await;
 
                 }
 

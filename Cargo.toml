@@ -14,16 +14,12 @@ authors = ["Paul Saunders"]
 
 #act_rs = "0.4.0"
 
-#Make async-trait optional
-
-act_rs = { path="../act_rs", features = ["async-trait"] } #Do not remove
-
-#act_rs = "0.3.0"
+act_rs = { path="../act_rs" } #, features = ["async-trait"] } #Do not remove
 
 tokio = { version = "1.46.1", features = ["rt", "rt-multi-thread", "sync", "macros"]}
 
-#[features]
-
+[features]
+async-trait = ["act_rs/async-trait"]
 
 #[package.metadata.docs.rs]
 #all-features = true

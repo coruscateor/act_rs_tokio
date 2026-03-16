@@ -2,8 +2,10 @@
 
 //#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
+#[cfg(feature = "async-trait")]
 mod task_actor;
 
+#[cfg(feature = "async-trait")]
 pub use task_actor::*;
 
 mod blocking_actor;
@@ -14,9 +16,9 @@ mod mac_task_actors;
 
 pub use mac_task_actors::*;
 
-pub mod entering;
+mod entering;
 
-//pub use entering::*;
+pub use entering::*;
 
 
 
