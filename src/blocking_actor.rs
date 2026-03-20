@@ -5,7 +5,7 @@
 
 use tokio::task::JoinHandle;
 
-use std::{marker::PhantomData, sync::Arc, panic::UnwindSafe};
+use std::{any::Any, marker::PhantomData, panic::{UnwindSafe, catch_unwind}, sync::Arc};
 
 use act_rs::{ActorState, ActorStateBuilder};
 
@@ -46,6 +46,64 @@ impl BlockingActor
                 BlockingActor::run(state);
 
             }      
+
+        })
+
+    }
+
+    pub fn spawn_catch_unwind<ST, F>(state: ST, err_fn: F) -> JoinHandle<()>
+        where ST: ActorState + Send + UnwindSafe + 'static,
+              F: FnOnce(Box<dyn Any + Send>) + Send + 'static
+    {
+        
+        tokio::task::spawn_blocking(move ||
+        {
+
+            let result = catch_unwind(||
+            {
+                    
+                BlockingActor::run(state);
+
+            });
+
+            if let Err(err) = result
+            {
+
+                err_fn(err);
+
+            }
+
+        })
+
+    }
+
+    pub fn spawn_build_and_catch_unwind<ST, STB, F>(state_builder: STB, err_fn: F) -> JoinHandle<()>
+        where ST: ActorState + Send + 'static,
+              STB: ActorStateBuilder<ST> + Send + UnwindSafe + 'static,
+              F: FnOnce(Box<dyn Any + Send>) + Send + 'static
+    {
+          
+        tokio::task::spawn_blocking(move ||
+        {
+
+            let result = catch_unwind(||
+            {
+
+                if let Some(state) = state_builder.build()
+                {
+
+                    BlockingActor::run(state);
+
+                }
+
+            });
+
+            if let Err(err) = result
+            {
+
+                err_fn(err);
+
+            }
 
         })
 

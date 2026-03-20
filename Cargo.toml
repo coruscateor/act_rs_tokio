@@ -18,6 +18,10 @@ act_rs = { path="../act_rs" } #, features = ["async-trait"] } #Do not remove
 
 tokio = { version = "1.46.1", features = ["rt", "rt-multi-thread", "sync", "macros"]}
 
+#Make optional
+
+futures = "0.3.32"
+
 [features]
 async-trait = ["act_rs/async-trait"]
 
