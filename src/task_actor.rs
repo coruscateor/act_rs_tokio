@@ -3,9 +3,11 @@
 
 use tokio::task::{self, JoinHandle, spawn_blocking, JoinError};
 //use futures::{executor::block_on, FutureExt};
-use std::{marker::PhantomData, sync::Arc, panic::UnwindSafe};
+use std::{any::Any, marker::PhantomData, panic::{AssertUnwindSafe, UnwindSafe}, sync::Arc};
 
-use act_rs::{ActorStateAsync, ActorStateBuilderAsync};
+use act_rs::{ActorStateAsync, ActorStateBuilderAsync, ActorStateUnwindSafeAsync};
+
+use futures::FutureExt;
 
 ///
 /// A task based actor.
@@ -49,6 +51,29 @@ impl TaskActor
 
     }
 
+    pub fn spawn_catch_unwind<ST, F>(state: ST, err_fn: F) -> JoinHandle<()>
+        where ST: ActorStateUnwindSafeAsync + Send + 'static, //+ UnwindSafe //ActorStateUnwindSafeAsync
+              F: AsyncFnOnce(Box<dyn Any + Send>) + Send + 'static
+    {
+        
+        tokio::spawn(async move
+        {
+    
+            let future = TaskActor::run_catch_unwind(state);
+
+            let result = future.catch_unwind().await; //future.catch_unwind().await;
+
+            if let Err(err) = result
+            {
+
+                err_fn(err).await;
+
+            }
+
+        })
+
+    }
+
     async fn run<ST>(mut state: ST)
         where ST: ActorStateAsync + Send + 'static
     {
@@ -68,6 +93,28 @@ impl TaskActor
         }
         
         state.post_run_async().await;
+
+    }
+
+    async fn run_catch_unwind<ST>(mut state: ST)
+        where ST: ActorStateAsync + Send + UnwindSafe + 'static //ActorStateUnwindSafeAsync
+    {
+
+        let mut proceed = true; 
+        
+        if AssertUnwindSafe(state.pre_run_async()).await
+        {
+
+            while proceed
+            {
+                
+                proceed = AssertUnwindSafe(state.run_async()).await;
+    
+            }
+
+        }
+        
+        AssertUnwindSafe(state.post_run_async()).await;
 
     }
 
