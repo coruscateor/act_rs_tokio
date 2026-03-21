@@ -5,7 +5,7 @@ use tokio::task::{self, JoinHandle, spawn_blocking, JoinError};
 //use futures::{executor::block_on, FutureExt};
 use std::{any::Any, marker::PhantomData, panic::{AssertUnwindSafe, UnwindSafe}, sync::Arc};
 
-use act_rs::{ActorStateAsync, ActorStateBuilderAsync, ActorStateUnwindSafeAsync};
+use act_rs::{ActorStateAsync, ActorStateBuilderAsync, ActorStateBuilderUnwindSafeAsync, ActorStateUnwindSafeAsync};
 
 use futures::FutureExt;
 
@@ -32,7 +32,7 @@ impl TaskActor
 
     }
 
-    pub fn spawn_and_build<ST, STB>(state_builder: STB) -> JoinHandle<()>
+    pub fn spawn_and_build_state<ST, STB>(state_builder: STB) -> JoinHandle<()>
         where ST: ActorStateAsync + Send + 'static,
               STB: ActorStateBuilderAsync<ST> + Send + 'static
     {
@@ -53,7 +53,7 @@ impl TaskActor
 
     pub fn spawn_catch_unwind<ST, F>(state: ST, err_fn: F) -> JoinHandle<()>
         where ST: ActorStateUnwindSafeAsync + Send + 'static, //+ UnwindSafe //ActorStateUnwindSafeAsync
-              F: AsyncFnOnce(Box<dyn Any + Send>) + Send + 'static
+              F: FnOnce(Box<dyn Any + Send>) + Send + 'static
     {
         
         tokio::spawn(async move
@@ -66,7 +66,9 @@ impl TaskActor
             if let Err(err) = result
             {
 
-                err_fn(err).await;
+                //Can't make AsyncFnOnce Send.
+
+                err_fn(err);
 
             }
 
@@ -74,7 +76,52 @@ impl TaskActor
 
     }
 
-    async fn run<ST>(mut state: ST)
+    pub fn spawn_build_state_and_catch_unwind<ST, STB, F>(state_builder: STB, err_fn: F) -> JoinHandle<()>
+        where ST: ActorStateUnwindSafeAsync + Send + 'static,
+              STB: ActorStateBuilderUnwindSafeAsync<ST> + Send + UnwindSafe + 'static,
+              F: FnOnce(bool, Box<dyn Any + Send>) + Send + 'static
+    {
+        
+        tokio::spawn(async move
+        {
+
+            match AssertUnwindSafe(state_builder.build_async()).catch_unwind().await
+            {
+
+                Ok(opt_state) =>
+                {
+
+                    if let Some(state) = opt_state
+                    {
+
+                        if let Err(err) = TaskActor::run_catch_unwind(state).catch_unwind().await
+                        {
+
+                            //bool: builder_error
+
+                            err_fn(false, err);
+
+                        }
+
+                    }
+
+                }
+                Err(err) =>
+                {
+
+                    //bool: builder_error
+
+                    err_fn(true, err);
+
+                }
+                
+            }
+
+        })
+
+    }
+
+    pub async fn run<ST>(mut state: ST)
         where ST: ActorStateAsync + Send + 'static
     {
 
@@ -96,7 +143,7 @@ impl TaskActor
 
     }
 
-    async fn run_catch_unwind<ST>(mut state: ST)
+    pub async fn run_catch_unwind<ST>(mut state: ST)
         where ST: ActorStateAsync + Send + UnwindSafe + 'static //ActorStateUnwindSafeAsync
     {
 
