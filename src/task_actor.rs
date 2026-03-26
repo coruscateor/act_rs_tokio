@@ -79,7 +79,7 @@ impl TaskActor
     pub fn spawn_build_state_and_catch_unwind<ST, STB, F>(state_builder: STB, err_fn: F) -> JoinHandle<()>
         where ST: ActorStateUnwindSafeAsync + Send + 'static,
               STB: ActorStateBuilderUnwindSafeAsync<ST> + Send + UnwindSafe + 'static,
-              F: FnOnce(bool, Box<dyn Any + Send>) + Send + 'static
+              F: FnOnce(Box<dyn Any + Send>) + Send + 'static
     {
         
         tokio::spawn(async move
@@ -97,9 +97,7 @@ impl TaskActor
                         if let Err(err) = TaskActor::run_catch_unwind(state).catch_unwind().await
                         {
 
-                            //bool: builder_error
-
-                            err_fn(false, err);
+                            err_fn(err);
 
                         }
 
@@ -109,9 +107,7 @@ impl TaskActor
                 Err(err) =>
                 {
 
-                    //bool: builder_error
-
-                    err_fn(true, err);
+                    err_fn(err);
 
                 }
                 
