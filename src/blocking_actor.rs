@@ -109,7 +109,7 @@ impl BlockingActor
 
     }
 
-    fn run<ST>(mut state: ST)
+    pub fn run<ST>(mut state: ST)
         where ST: ActorState + Send + 'static
     {
 
