@@ -51,11 +51,13 @@ impl BlockingActor
 
     }
 
-    pub fn spawn_catch_unwind<ST, F>(state: ST, err_fn: F) -> JoinHandle<()>
+    pub fn spawn_catch_unwind<ST, F>(state: ST, err_fn: &Arc<F>) -> JoinHandle<()>
         where ST: ActorState + Send + UnwindSafe + 'static,
-              F: FnOnce(Box<dyn Any + Send>) + Send + 'static
+              F: Fn(Box<dyn Any + Send>) + Send + Sync + 'static
     {
         
+        let err_fn_clone = err_fn.clone();
+
         tokio::task::spawn_blocking(move ||
         {
 
@@ -69,7 +71,7 @@ impl BlockingActor
             if let Err(err) = result
             {
 
-                err_fn(err);
+                err_fn_clone(err);
 
             }
 
@@ -77,11 +79,13 @@ impl BlockingActor
 
     }
 
-    pub fn spawn_build_and_catch_unwind<ST, STB, F>(state_builder: STB, err_fn: F) -> JoinHandle<()>
+    pub fn spawn_build_and_catch_unwind<ST, STB, F>(state_builder: STB, err_fn: &Arc<F>) -> JoinHandle<()>
         where ST: ActorState + Send + 'static,
               STB: ActorStateBuilder<ST> + Send + UnwindSafe + 'static,
-              F: FnOnce(Box<dyn Any + Send>) + Send + 'static
+              F: Fn(Box<dyn Any + Send>) + Send + Sync + 'static
     {
+
+        let err_fn_clone = err_fn.clone();
           
         tokio::task::spawn_blocking(move ||
         {
@@ -101,7 +105,7 @@ impl BlockingActor
             if let Err(err) = result
             {
 
-                err_fn(err);
+                err_fn_clone(err);
 
             }
 
@@ -112,11 +116,11 @@ impl BlockingActor
     pub fn run<ST>(mut state: ST)
         where ST: ActorState + Send + 'static
     {
-
-        let mut proceed = true; 
         
         if state.pre_run()
         {
+
+            let mut proceed = true; 
 
             while proceed
             {
