@@ -5,7 +5,7 @@ use tokio::task::{self, JoinHandle, spawn_blocking, JoinError};
 //use futures::{executor::block_on, FutureExt};
 use std::{any::Any, marker::PhantomData, panic::{AssertUnwindSafe, UnwindSafe}, sync::Arc};
 
-use act_rs::{ActorStateAsync, ActorStateBuilderAsync, ActorStateBuilderUnwindSafeAsync, ActorStateUnwindSafeAsync};
+use act_rs::{ActorStateAsync, ActorStateBuilderAsync, ActorStateBuilderUnwindSafeAsync, ActorStateUnwindSafeAsync, AsyncPanicHandler};
 
 use futures::FutureExt;
 
@@ -51,10 +51,38 @@ impl TaskActor
 
     }
 
-    pub fn spawn_catch_unwind<ST, F>(state: ST, err_fn: F) -> JoinHandle<()>
+    pub fn spawn_catch_unwind<ST, PH>(state: ST, panic_handler: &Arc<PH>) -> JoinHandle<()>
         where ST: ActorStateUnwindSafeAsync + Send + 'static, //+ UnwindSafe //ActorStateUnwindSafeAsync
-              F: FnOnce(Box<dyn Any + Send>) + Send + 'static
+              PH: AsyncPanicHandler + 'static
     {
+
+        let panic_handler_clone = panic_handler.clone();
+        
+        tokio::spawn(async move
+        {
+    
+            let future = TaskActor::run_catch_unwind(state);
+
+            let result = future.catch_unwind().await; //future.catch_unwind().await;
+
+            if let Err(err) = result
+            {
+
+                panic_handler_clone.handle_panic(err).await;
+
+            }
+
+        })
+
+    }
+
+    /*
+    pub fn spawn_catch_unwind_async_fn<ST, F>(state: ST, err_fn: &Arc<F>) -> JoinHandle<()>
+        where ST: ActorStateUnwindSafeAsync + Send + 'static, //+ UnwindSafe //ActorStateUnwindSafeAsync
+              F: AsyncFn(Box<dyn Any + Send>) + Send + Sync + 'static
+    {
+
+        let err_fn_clone = err_fn.clone();
         
         tokio::spawn(async move
         {
@@ -68,20 +96,23 @@ impl TaskActor
 
                 //Can't make AsyncFnOnce Send.
 
-                err_fn(err);
+                err_fn_clone(err).await;
 
             }
 
         })
 
     }
+    */
 
-    pub fn spawn_build_state_and_catch_unwind<ST, STB, F>(state_builder: STB, err_fn: F) -> JoinHandle<()>
+    pub fn spawn_build_state_and_catch_unwind<ST, STB, PH>(state_builder: STB, panic_handler: &Arc<PH>) -> JoinHandle<()>
         where ST: ActorStateUnwindSafeAsync + Send + 'static,
               STB: ActorStateBuilderUnwindSafeAsync<ST> + Send + UnwindSafe + 'static,
-              F: FnOnce(Box<dyn Any + Send>) + Send + 'static
+              PH: AsyncPanicHandler + 'static
     {
         
+        let panic_handler_clone = panic_handler.clone();
+
         tokio::spawn(async move
         {
 
@@ -97,7 +128,7 @@ impl TaskActor
                         if let Err(err) = TaskActor::run_catch_unwind(state).catch_unwind().await
                         {
 
-                            err_fn(err);
+                            panic_handler_clone.handle_panic(err).await;
 
                         }
 
@@ -107,7 +138,7 @@ impl TaskActor
                 Err(err) =>
                 {
 
-                    err_fn(err);
+                    panic_handler_clone.handle_panic(err).await;
 
                 }
                 
@@ -120,11 +151,11 @@ impl TaskActor
     pub async fn run<ST>(mut state: ST)
         where ST: ActorStateAsync + Send + 'static
     {
-
-        let mut proceed = true; 
         
         if state.pre_run_async().await
         {
+
+            let mut proceed = true; 
 
             while proceed
             {
@@ -142,11 +173,11 @@ impl TaskActor
     pub async fn run_catch_unwind<ST>(mut state: ST)
         where ST: ActorStateAsync + Send + UnwindSafe + 'static //ActorStateUnwindSafeAsync
     {
-
-        let mut proceed = true; 
         
         if AssertUnwindSafe(state.pre_run_async()).await
         {
+
+            let mut proceed = true; 
 
             while proceed
             {
