@@ -19,6 +19,9 @@ pub struct BlockingActor
 impl BlockingActor
 {
 
+    ///
+    /// Spawn a new actor with the provided state.
+    /// 
     pub fn spawn<ST>(state: ST) -> JoinHandle<()>
         where ST: ActorState + Send + 'static
     {
@@ -32,6 +35,9 @@ impl BlockingActor
 
     }
 
+    ///
+    /// Spawn a new actor and construct its state with the provided state builder in its thread.
+    /// 
     pub fn spawn_and_build<ST, STB>(state_builder: STB) -> JoinHandle<()>
         where ST: ActorState + Send + 'static,
               STB: ActorStateBuilder<ST> + Send + 'static

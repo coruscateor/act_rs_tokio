@@ -94,7 +94,7 @@ macro_rules! impl_task_actor
 }
 
 /**
- * Similar to impl_task_actor, but the produced spawn method takes an actor state builder object instead of the actor state itself.
+ * Similar to impl_task_actor, but it also generates a spawn_and_build_state method for building the actor state in another task.
  * 
  * Requires everything that impl_task_actor does, but also that an actor state builder type with a method "build_async" that returns an optional actor state object share the scope of the macro call.
  * 

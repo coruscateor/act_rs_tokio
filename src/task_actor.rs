@@ -7,6 +7,7 @@ use std::{any::Any, marker::PhantomData, panic::{AssertUnwindSafe, UnwindSafe}, 
 
 use act_rs::{ActorStateAsync, ActorStateBuilderAsync, ActorStateBuilderUnwindSafeAsync, ActorStateUnwindSafeAsync, AsyncPanicHandler};
 
+#[cfg(feature="futures")]
 use futures::FutureExt;
 
 ///
@@ -19,6 +20,9 @@ pub struct TaskActor
 impl TaskActor
 {
 
+    ///
+    /// Spawn a new actor with the provided state.
+    /// 
     pub fn spawn<ST>(state: ST) -> JoinHandle<()>
         where ST: ActorStateAsync + Send + 'static
     {
@@ -32,6 +36,9 @@ impl TaskActor
 
     }
 
+    ///
+    /// Spawn a new actor and construct its state with the provided state builder in its task.
+    /// 
     pub fn spawn_and_build_state<ST, STB>(state_builder: STB) -> JoinHandle<()>
         where ST: ActorStateAsync + Send + 'static,
               STB: ActorStateBuilderAsync<ST> + Send + 'static
@@ -51,6 +58,7 @@ impl TaskActor
 
     }
 
+    #[cfg(feature="futures")]
     pub fn spawn_catch_unwind<ST, PH>(state: ST, panic_handler: &Arc<PH>) -> JoinHandle<()>
         where ST: ActorStateUnwindSafeAsync + Send + 'static, //+ UnwindSafe //ActorStateUnwindSafeAsync
               PH: AsyncPanicHandler + 'static
@@ -105,6 +113,7 @@ impl TaskActor
     }
     */
 
+    #[cfg(feature="futures")]
     pub fn spawn_build_state_and_catch_unwind<ST, STB, PH>(state_builder: STB, panic_handler: &Arc<PH>) -> JoinHandle<()>
         where ST: ActorStateUnwindSafeAsync + Send + 'static,
               STB: ActorStateBuilderUnwindSafeAsync<ST> + Send + UnwindSafe + 'static,
