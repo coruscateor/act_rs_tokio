@@ -20,6 +20,9 @@ pub struct TaskActor
 impl TaskActor
 {
 
+    ///
+    /// Spawn a new actor with the provided state.
+    /// 
     pub fn spawn<ST>(state: ST) -> JoinHandle<()>
         where ST: ActorStateAsync + Send + 'static
     {
@@ -33,6 +36,9 @@ impl TaskActor
 
     }
 
+    ///
+    /// Spawn a new actor and construct its state with the provided state builder in its task.
+    /// 
     pub fn spawn_and_build_state<ST, STB>(state_builder: STB) -> JoinHandle<()>
         where ST: ActorStateAsync + Send + 'static,
               STB: ActorStateBuilderAsync<ST> + Send + 'static
