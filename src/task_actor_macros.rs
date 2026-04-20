@@ -137,7 +137,7 @@ macro_rules! impl_task_actor_build_state
                     tokio::spawn(async move
                     {
 
-                        let mut opt_state = state_builder.build_async().await;
+                        let opt_state = state_builder.build_async().await;
 
                         if let Some(state) = opt_state
                         {
@@ -276,7 +276,7 @@ macro_rules! impl_task_actor_build_state_flexible
                     tokio::spawn(async move
                     {
 
-                        let mut opt_state = state_builder.build_async().await;
+                        let opt_state = state_builder.build_async().await;
 
                         if let Some(state) = opt_state
                         {

@@ -20,7 +20,8 @@ mod entering;
 
 pub use entering::*;
 
-
+#[cfg(test)]
+mod task_actor_macro_tests;
 
 /*
 pub fn add(left: u64, right: u64) -> u64 {
