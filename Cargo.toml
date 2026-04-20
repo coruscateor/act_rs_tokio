@@ -25,6 +25,9 @@ futures = { version = "0.3.32", optional = true }
 [features]
 async-trait = ["act_rs/async-trait"]
 
+[dev-dependencies]
+pastey = "0.2.1"
+
 #catch_unwind = ["futures"]
 
 #[package.metadata.docs.rs]

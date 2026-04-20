@@ -15,6 +15,7 @@ version = "0.2.0-alpha"
 dependencies = [
  "act_rs",
  "futures",
+ "pastey",
  "tokio",
 ]
 
@@ -216,6 +217,12 @@ checksum = "62948e14d923ea95ea2c7c86c71013138b66525b86bdc08d2dcc262bdb497b87"
 dependencies = [
  "memchr",
 ]
+
+[[package]]
+name = "pastey"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b867cad97c0791bbd3aaa6472142568c6c9e8f71937e98379f584cfb0cf35bec"
 
 [[package]]
 name = "pin-project-lite"
