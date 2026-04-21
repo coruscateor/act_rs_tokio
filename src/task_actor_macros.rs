@@ -112,10 +112,77 @@ macro_rules! impl_task_actor_build_state
         paste!
         {
 
+            
             pub struct $actor_type
             {
             }
 
+            impl $actor_type
+            {
+
+                pub fn spawn_and_build_state(state_builder: [<$actor_type StateBuilder>]) -> JoinHandle<()>
+                {
+                    
+                    tokio::spawn(async move
+                    {
+
+                        let opt_state = state_builder.build_async().await;
+
+                        if let Some(state) = opt_state
+                        {
+
+                            $actor_type::run(state).await;
+
+                        }
+
+                    })
+
+                }
+
+                async fn run(mut state: [<$actor_type State>])
+                {
+                    
+                    if state.pre_run_async().await
+                    {
+
+                        let mut proceed = true; 
+
+                        while proceed
+                        {
+                            
+                            proceed = state.run_async().await;
+                
+                        }
+
+                    }
+
+                    state.post_run_async().await;
+
+                }
+
+            }
+            
+        }
+
+    }
+
+}
+
+#[macro_export]
+macro_rules! impl_task_actor_build_state_with_spawn
+{
+
+    ($actor_type:ident) =>
+    {
+
+        paste!
+        {
+
+            
+            pub struct $actor_type
+            {
+            }
+            
             impl $actor_type
             {
 
@@ -258,6 +325,71 @@ macro_rules! impl_task_actor_build_state_flexible
             impl $actor_type
             {
 
+                pub fn spawn_and_build_state(state_builder: [<$actor_type StateBuilder>]) -> JoinHandle<()>
+                {
+                    
+                    tokio::spawn(async move
+                    {
+
+                        let opt_state = state_builder.build_async().await;
+
+                        if let Some(state) = opt_state
+                        {
+
+                            $actor_type::run(state).await;
+
+                        }
+
+                    })
+
+                }
+
+                async fn run(mut state: [<$actor_type State>])
+                {
+                    
+                    if state.pre_run_async().await.into()
+                    {
+
+                        let mut proceed = true; 
+
+                        while proceed
+                        {
+                            
+                            proceed = state.run_async().await.into();
+                
+                        }
+
+                    }
+
+                    state.post_run_async().await;
+
+                }
+
+            }
+            
+        }
+
+    }
+
+}
+
+#[macro_export]
+macro_rules! impl_task_actor_build_state_with_spawn_flexible
+{
+
+    ($actor_type:ident) =>
+    {
+
+        paste!
+        {
+
+            pub struct $actor_type
+            {
+            }
+
+            impl $actor_type
+            {
+
                 pub fn spawn(state: [<$actor_type State>]) -> JoinHandle<()>
                 {
                     
@@ -319,6 +451,7 @@ macro_rules! impl_task_actor_build_state_flexible
 }
 
 //catch_unwind
+
 
 
 
@@ -406,7 +539,93 @@ macro_rules! impl_task_actor_build_state_and_catch_unwind
             impl $actor_type
             {
 
-                pub fn spawn_catch_unwind<F>(state: [<$actor_type State>], panic_handler: &Arc<$panic_handler_type>) -> JoinHandle<()>
+                pub fn spawn_build_state_and_catch_unwind(state_builder: [<$actor_type StateBuilder>], panic_handler: &Arc<$panic_handler_type>) -> JoinHandle<()>
+                {
+                    
+                    let panic_handler_clone = panic_handler.clone();
+
+                    tokio::spawn(async move
+                    {
+
+                        match AssertUnwindSafe(state_builder.build_async()).catch_unwind().await
+                        {
+
+                            Ok(opt_state) =>
+                            {
+
+                                if let Some(state) = opt_state
+                                {
+
+                                    if let Err(err) = $actor_type::run_catch_unwind(state).catch_unwind().await
+                                    {
+
+                                        panic_handler_clone.handle_panic(err).await;
+
+                                    }
+
+                                }
+
+                            }
+                            Err(err) =>
+                            {
+
+                                panic_handler_clone.handle_panic(err).await;
+
+                            }
+                            
+                        }
+
+                    })
+
+                }
+
+                async fn run_catch_unwind(mut state: [<$actor_type State>])
+                {
+                    
+                    if AssertUnwindSafe(state.pre_run_async()).await
+                    {
+
+                        let mut proceed = true; 
+
+                        while proceed
+                        {
+                            
+                            proceed = AssertUnwindSafe(state.run_async()).await;
+                
+                        }
+
+                    }
+                    
+                    AssertUnwindSafe(state.post_run_async()).await;
+
+                }
+
+            }
+            
+        }
+
+    }
+
+}
+
+#[macro_export]
+macro_rules! impl_task_actor_build_state_with_spawn_catch_unwind
+{
+
+    ($actor_type:ident, $panic_handler_type:ty) =>
+    {
+
+        paste!
+        {
+
+            pub struct $actor_type
+            {
+            }
+
+            impl $actor_type
+            {
+
+                pub fn spawn_catch_unwind(state: [<$actor_type State>], panic_handler: &Arc<$panic_handler_type>) -> JoinHandle<()>
                 {
 
                     let panic_handler_clone = panic_handler.clone();
@@ -442,7 +661,7 @@ macro_rules! impl_task_actor_build_state_and_catch_unwind
                                 if let Some(state) = opt_state
                                 {
 
-                                    if let Err(err) = TaskActor::run_catch_unwind(state).catch_unwind().await
+                                    if let Err(err) = $actor_type::run_catch_unwind(state).catch_unwind().await
                                     {
 
                                         panic_handler_clone.handle_panic(err).await;
@@ -495,6 +714,7 @@ macro_rules! impl_task_actor_build_state_and_catch_unwind
 }
 
 //flexible catch_unwind
+
 
 
 #[macro_export]
@@ -581,7 +801,95 @@ macro_rules! impl_task_actor_build_state_and_catch_unwind_flexible
             impl $actor_type
             {
 
-                pub fn spawn_catch_unwind<F>(state: [<$actor_type State>], panic_handler: &Arc<$panic_handler_type>) -> JoinHandle<()>
+                pub fn spawn_build_state_and_catch_unwind(state_builder: [<$actor_type StateBuilder>], panic_handler: &Arc<$panic_handler_type>) -> JoinHandle<()>
+                {
+                    
+                    let panic_handler_clone = panic_handler.clone();
+
+                    tokio::spawn(async move
+                    {
+
+                        match AssertUnwindSafe(state_builder.build_async()).catch_unwind().await
+                        {
+
+                            Ok(opt_state) =>
+                            {
+
+                                if let Some(state) = opt_state
+                                {
+
+                                    if let Err(err) = $actor_type::run_catch_unwind(state).catch_unwind().await
+                                    {
+
+                                        panic_handler_clone.handle_panic(err).await;
+
+                                    }
+
+                                }
+
+                            }
+                            Err(err) =>
+                            {
+
+                                panic_handler_clone.handle_panic(err).await;
+
+                            }
+                            
+                        }
+
+                    })
+
+                }
+
+                async fn run_catch_unwind(mut state: [<$actor_type State>])
+                {
+                    
+                    if AssertUnwindSafe(state.pre_run_async()).await.into()
+                    {
+
+                        let mut proceed = true; 
+
+                        while proceed
+                        {
+                            
+                            proceed = AssertUnwindSafe(state.run_async()).await.into();
+                
+                        }
+
+                    }
+                    
+                    AssertUnwindSafe(state.post_run_async()).await;
+
+                }
+
+            }
+            
+        }
+
+    }
+
+}
+
+
+
+#[macro_export]
+macro_rules! impl_task_actor_build_state_with_spawn_catch_unwind_flexible
+{
+
+    ($actor_type:ident, $panic_handler_type:ty) =>
+    {
+
+        paste!
+        {
+
+            pub struct $actor_type
+            {
+            }
+
+            impl $actor_type
+            {
+
+                pub fn spawn_catch_unwind(state: [<$actor_type State>], panic_handler: &Arc<$panic_handler_type>) -> JoinHandle<()>
                 {
 
                     let panic_handler_clone = panic_handler.clone();
@@ -617,7 +925,7 @@ macro_rules! impl_task_actor_build_state_and_catch_unwind_flexible
                                 if let Some(state) = opt_state
                                 {
 
-                                    if let Err(err) = TaskActor::run_catch_unwind(state).catch_unwind().await
+                                    if let Err(err) = $actor_type::run_catch_unwind(state).catch_unwind().await
                                     {
 
                                         panic_handler_clone.handle_panic(err).await;
