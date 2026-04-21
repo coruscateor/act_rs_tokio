@@ -1,6 +1,6 @@
 [package]
 name = "act_rs_tokio"
-version = "0.2.0-alpha"
+version = "0.2.0-beta"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 description = "Act.rs Tokio is a minimal Tokio oriented actor framework."
@@ -12,11 +12,11 @@ authors = ["Paul Saunders"]
 
 [dependencies]
 
-#act_rs = "0.4.0"
+act_rs = "0.5.0"
 
-act_rs = { path="../act_rs" } #, features = ["async-trait"] } #Do not remove
+#act_rs = { path="../act_rs" } #, features = ["async-trait"] } #Do not remove
 
-tokio = { version = "1.46.1", features = ["rt", "rt-multi-thread", "sync", "macros"]}
+tokio = { version = "1.52.1", features = ["rt", "rt-multi-thread", "sync", "macros"]}
 
 #Make optional
 

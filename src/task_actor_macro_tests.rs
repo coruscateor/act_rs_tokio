@@ -13,8 +13,7 @@ use std::sync::Arc;
 #[cfg(feature="futures")]
 use futures::FutureExt;
 
-use crate::{impl_task_actor, impl_task_actor_build_state, impl_task_actor_build_state_flexible, impl_task_actor_catch_unwind, impl_task_actor_flexible};
-
+use crate::{impl_task_actor, impl_task_actor_build_state, impl_task_actor_build_state_and_catch_unwind, impl_task_actor_build_state_and_catch_unwind_flexible, impl_task_actor_build_state_flexible, impl_task_actor_build_state_with_spawn, impl_task_actor_build_state_with_spawn_catch_unwind, impl_task_actor_build_state_with_spawn_catch_unwind_flexible, impl_task_actor_build_state_with_spawn_flexible, impl_task_actor_catch_unwind, impl_task_actor_catch_unwind_flexible, impl_task_actor_flexible};
 
 struct TestActorState
 {
@@ -194,7 +193,7 @@ impl TestPaincHander
 
     }
 
-    pub async fn handle_panic(&self, boxed_panic: Box<dyn Any + Send>)
+    pub async fn handle_panic(&self, _boxed_panic: Box<dyn Any + Send>)
     {
 
         println!("oops!");
@@ -266,10 +265,12 @@ async fn task_actor_build_state()
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn task_actor_flexible()
+async fn task_actor_build_state_with_spawn()
 {
 
-    impl_task_actor_flexible!(TestActor);
+    impl_task_actor_build_state_with_spawn!(TestActor);
+
+    //
 
     let (sender, receiver) = unbounded_channel();
 
@@ -279,13 +280,7 @@ async fn task_actor_flexible()
 
     without_builder(receiver).await;
 
-}
-
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn task_actor_build_state_flexible()
-{
-
-    impl_task_actor_build_state_flexible!(TestActor);
+    //
 
     let (sender, receiver) = unbounded_channel();
 
@@ -296,6 +291,68 @@ async fn task_actor_build_state_flexible()
     with_builder(receiver).await;
 
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn task_actor_flexible()
+{
+
+    impl_task_actor_flexible!(TestActorFlow);
+
+    let (sender, receiver) = unbounded_channel();
+
+    let state = TestActorFlowState::new(sender);
+
+    TestActorFlow::spawn(state);
+
+    without_builder(receiver).await;
+
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn task_actor_build_state_flexible()
+{
+
+    impl_task_actor_build_state_flexible!(TestActorFlow);
+
+    let (sender, receiver) = unbounded_channel();
+
+    let state_builder = TestActorFlowStateBuilder::new(sender);
+
+    TestActorFlow::spawn_and_build_state(state_builder);
+
+    with_builder(receiver).await;
+
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn task_actor_build_state_with_spawn_flexible()
+{
+
+    impl_task_actor_build_state_with_spawn_flexible!(TestActorFlow);
+
+    //
+
+    let (sender, receiver) = unbounded_channel();
+
+    let state = TestActorFlowState::new(sender);
+
+    TestActorFlow::spawn(state);
+
+    without_builder(receiver).await;
+
+    //
+
+    let (sender, receiver) = unbounded_channel();
+
+    let state_builder = TestActorFlowStateBuilder::new(sender);
+
+    TestActorFlow::spawn_and_build_state(state_builder);
+
+    with_builder(receiver).await;
+
+}
+
+//catch_unwind
 
 #[cfg(feature="futures")]
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -315,3 +372,127 @@ async fn task_actor_catch_unwind()
     without_builder(receiver).await;
 
 }
+
+#[cfg(feature="futures")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn task_actor_build_state_and_catch_unwind()
+{
+
+    impl_task_actor_build_state_and_catch_unwind!(TestActor, TestPaincHander);
+
+    let (sender, receiver) = unbounded_channel();
+
+    let state_builder = TestActorStateBuilder::new(sender);
+
+    let panic_handler = Arc::new(TestPaincHander::new());
+
+    TestActor::spawn_build_state_and_catch_unwind(state_builder, &panic_handler);
+
+    with_builder(receiver).await;
+
+}
+
+#[cfg(feature="futures")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn task_actor_build_state_with_spawn_catch_unwind()
+{
+
+    impl_task_actor_build_state_with_spawn_catch_unwind!(TestActor, TestPaincHander);
+
+    let panic_handler = Arc::new(TestPaincHander::new());
+
+    //
+
+    let (sender, receiver) = unbounded_channel();
+
+    let state = TestActorState::new(sender);
+
+    TestActor::spawn_catch_unwind(state, &panic_handler);
+
+    without_builder(receiver).await;
+
+    //
+
+    let (sender, receiver) = unbounded_channel();
+
+    let state_builder = TestActorStateBuilder::new(sender);
+
+    TestActor::spawn_build_state_and_catch_unwind(state_builder, &panic_handler);
+
+    with_builder(receiver).await;
+
+}
+
+//flexible catch_unwind
+
+#[cfg(feature="futures")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn task_actor_catch_unwind_flexible()
+{
+
+    impl_task_actor_catch_unwind_flexible!(TestActorFlow, TestPaincHander);
+
+    let (sender, receiver) = unbounded_channel();
+
+    let state = TestActorFlowState::new(sender);
+
+    let panic_handler = Arc::new(TestPaincHander::new());
+
+    TestActorFlow::spawn_catch_unwind(state, &panic_handler);
+
+    without_builder(receiver).await;
+
+}
+
+#[cfg(feature="futures")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn task_actor_build_state_and_catch_unwind_flexible()
+{
+
+    impl_task_actor_build_state_and_catch_unwind_flexible!(TestActorFlow, TestPaincHander);
+
+    let (sender, receiver) = unbounded_channel();
+
+    let state_builder = TestActorFlowStateBuilder::new(sender);
+
+    let panic_handler = Arc::new(TestPaincHander::new());
+
+    TestActorFlow::spawn_build_state_and_catch_unwind(state_builder, &panic_handler);
+
+    with_builder(receiver).await;
+
+}
+
+#[cfg(feature="futures")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn task_actor_build_state_with_spawn_catch_unwind_flexible()
+{
+
+    impl_task_actor_build_state_with_spawn_catch_unwind_flexible!(TestActorFlow, TestPaincHander);
+
+    let panic_handler = Arc::new(TestPaincHander::new());
+
+    //
+
+    let (sender, receiver) = unbounded_channel();
+
+    let state = TestActorFlowState::new(sender);
+
+    TestActorFlow::spawn_catch_unwind(state, &panic_handler);
+
+    without_builder(receiver).await;
+
+    //
+
+    let (sender, receiver) = unbounded_channel();
+
+    let state_builder = TestActorFlowStateBuilder::new(sender);
+
+    let panic_handler = Arc::new(TestPaincHander::new());
+
+    TestActorFlow::spawn_build_state_and_catch_unwind(state_builder, &panic_handler);
+
+    with_builder(receiver).await;
+
+}
+
