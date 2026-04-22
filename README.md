@@ -25,38 +25,50 @@ Act.rs Tokio is a minimal Tokio oriented actor framework.
 
 An actor is an object that runs in its own thread or task. You would usually communicate with it via channels.
 
-Actors have their own state, so ideally you just send a them messages indicating what you want done and you shouldn't necessarily need to move everything to do this work into the scope of each individual actor.
+<br />
+
+## Related Actor Crates
+
+You can also create task based actors:
+
+This crate uses types from [act_rs](https://crates.io/crates/act_rs).
+
+See also: [act_rs_smol](https://crates.io/crates/act_rs_smol)
 
 <br />
 
 ## A Basic Example
 
+Here's the first example in the Act.rs readme adapted to implement a macro generated actor:
+
 ```rust
 
     //Adapted from the std TwoPlusTwoActorState ThreadActor test (in Act.rs (act_rs)). 
 
-    //use crate::ActorState;
+    use tokio::sync::mpsc::{UnboundedSender, unbounded_channel};
 
-    use act_rs::ActorState;
+    use act_rs_tokio::impl_task_actor;
 
-    use std::sync::mpsc::{Sender, channel};
+    //Need for impl_task_actor:
 
-    //use super::*;
+    use act_rs::impl_pre_and_post_run_async;
 
-    use act_rs::std::ThreadActor;
+    use pastey::paste;
+
+    use tokio::task::JoinHandle;
 
     struct TwoPlusTwoActorState
     {
 
         number: u32,
-        client_sender: Sender<String>
+        client_sender: UnboundedSender<String>
 
     }
 
     impl TwoPlusTwoActorState
     {
 
-        pub fn new(client_sender: Sender<String>) -> Self
+        pub fn new(client_sender: UnboundedSender<String>) -> Self
         {
 
             Self
@@ -68,13 +80,10 @@ Actors have their own state, so ideally you just send a them messages indicating
             }
 
         }
-        
-    }
 
-    impl ActorState for TwoPlusTwoActorState
-    {
+        impl_pre_and_post_run_async!();
 
-        fn run(&mut self) -> bool
+        async fn run_async(&mut self) -> bool
         {
 
             if self.number < 4
@@ -98,65 +107,26 @@ Actors have their own state, so ideally you just send a them messages indicating
             false
             
         }
-
+        
     }
 
-    fn main()
+    impl_task_actor!(TwoPlusTwoActor);
+
+    #[tokio::main(flavor = "multi_thread", worker_threads = 2)]
+    async fn main()
     {
 
-        let (sender, receiver) = channel();
+        let (sender, mut receiver) = unbounded_channel();
 
-        ThreadActor::spawn(TwoPlusTwoActorState::new(sender));
+        TwoPlusTwoActor::spawn(TwoPlusTwoActorState::new(sender));
 
-        let res = receiver.recv().expect("Error: Message not delivered");
+        let res = receiver.recv().await.expect("Error: Message not delivered");
 
         println!("{}", res);
 
     }
 
 ```
-
-<br />
-
-In the above example an actor sends a String message to the main thread which prints it out.
-
-Note that the actor continues or stops running depending on whether you return true or false from the run method. This is the run phase of the actor. There are also pre-run and post-run phases represented by pre_run and post_run methods which can also be manually implemented.
-
-This is also the case with async actors as well, but each method you implement has an additional "_async" on the end of its name.
-
-Lastly Act.rs actors do not handle communications or errors by default. It is left up to you to decide how to handle these issues.
-
-<br />
-
-
-## An Overview
-
-You create a state struct that contains the state of your actor.
-
-This state struct should implement either ActorState or ActorStateAsync depending on whether or not you want the actor to be async compatible (Macro generated actors don't have this requirement and the state struct can implement the required methods in its impl block).
-
-Finally pass the state into the actor spawn method and there you have your actor, which basically runs until its run method returns false.
-
-<br />
-
-## Pipelining
-
-Actors can be used to help you setup pipelines.
-
-You would setup a pipeline to divide work into stages which potentially would be performed on different threads depending on what kind of actors you chose among other things.
-
-<br />
-
-## Potential Issues When Setting Up
-
-When setting up your actors with input channels or message queues, you should:
-
-- Make sure that your actors don't wait excessively or get stuck (wait indefinitely) when doing work.
-- If you are using actors as part of a pipeline; watch out for message loops.
-- Make sure that your actors don't exit unexpectedly.
-- Check for bottlenecks and possibly implement a way to add actors and remove actors from a particular stage or channel dynamically (pipelines).
-
-If you follow these guidelines you should have a productive time using Act.rs.
 
 <br />
 
@@ -176,11 +146,8 @@ If you follow these guidelines you should have a productive time using Act.rs.
 
 - Add more documentation
 - Add examples
-- Add tests
+- Add more tests
 - Cleanup the code
-- Add methods to all actor structs and macros which allow you to construct the actor-state in the actors thread or task, passing in any necessary parameters in order to do this e.g. channel sender and receiver objects.
-- Add procedural macros which generate actor types based on associated actor states.
-- Make the inclusion of the async_trait dependency and dependant types optional.
 
 <br />
 
