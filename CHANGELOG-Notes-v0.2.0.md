@@ -1,10 +1,10 @@
-commit 90cfcf115fd382775f4786188ab93a12a4ae6a9a
+commit 90cfcf115fd382775f4786188ab93a12a4ae6a9a -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Wed Apr 22 16:11:42 2026 +1200
 
     - Updated the readme
 
-commit 023fb3b78702fc93e98f2a2d4c04c71d822edd8d
+commit 023fb3b78702fc93e98f2a2d4c04c71d822edd8d -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Tue Apr 21 21:02:08 2026 +1200
 
@@ -21,7 +21,7 @@ Date:   Tue Apr 21 21:02:08 2026 +1200
     - Added the impl_task_actor_build_state_with_spawn, impl_task_actor_build_state_with_spawn_flexible, impl_task_actor_build_state_with_spawn_catch_unwind,
     impl_task_actor_catch_unwind_flexible and impl_task_actor_build_state_with_spawn_catch_unwind_flexible macros.
 
-commit 88f7e0601c386cbf7a235d1efbfea9de6c1cdc67
+commit 88f7e0601c386cbf7a235d1efbfea9de6c1cdc67 -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Mon Apr 20 20:58:22 2026 +1200
 
@@ -31,7 +31,7 @@ Date:   Mon Apr 20 20:58:22 2026 +1200
     
     - Other minor changes.
 
-commit e2a04158592720dd890700f2acc37561fb7515af
+commit e2a04158592720dd890700f2acc37561fb7515af -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Mon Apr 20 14:41:05 2026 +1200
 
