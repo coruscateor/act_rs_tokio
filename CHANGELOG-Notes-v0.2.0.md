@@ -41,13 +41,13 @@ Date:   Mon Apr 20 14:41:05 2026 +1200
     
     - Replaced the ActorStateBuilderUnwindSafeAsync trait bound with the ActorStateBuilderAsync<ST> and UnwindSafe trait bounds in the spawn_build_state_and_catch_unwind method in the TaskActor implementation.
 
-commit 27a3da91f0a4319adeee650f37daae42dc1a3a48
+commit 27a3da91f0a4319adeee650f37daae42dc1a3a48 -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Fri Apr 17 19:07:46 2026 +1200
 
     - Updated and added some documentation.
 
-commit 3f2e3c17af052f3083682306199cb87e13d7f9b2
+commit 3f2e3c17af052f3083682306199cb87e13d7f9b2 -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Fri Apr 17 16:02:33 2026 +1200
 
@@ -55,7 +55,7 @@ Date:   Fri Apr 17 16:02:33 2026 +1200
     
     - Made the spawn_catch_unwind and spawn_build_state_and_catch_unwind methods of the TaskActor implementation dependant on the inclusion of the futures feature.
 
-commit 8c6d21b5b90320047e5ca38b2fa7834fbbf40e7b
+commit 8c6d21b5b90320047e5ca38b2fa7834fbbf40e7b -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Wed Apr 8 14:57:35 2026 +1200
 
@@ -73,7 +73,7 @@ Date:   Wed Apr 8 14:57:35 2026 +1200
     
     - Moved the “proceed” bool meta-declarations into the “if state.pre_run_async().await” and “if AssertUnwindSafe(state.pre_run_async()).await” scopes in the run and run_catch_unwind methods of the TaskActor implementation respectively.
 
-commit 19e4350229e49532d1a43f890d12587481e4be4e
+commit 19e4350229e49532d1a43f890d12587481e4be4e -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Thu Mar 26 18:37:59 2026 +1300
 
@@ -99,7 +99,7 @@ Date:   Thu Mar 26 18:37:59 2026 +1300
     
     - Removed the bool parameter of the err_fn closure parameter of the spawn_build_state_and_catch_unwind method of the TaskActor implementation.
 
-commit 862f910975d6668f443056cf22e6d66453b56f33
+commit 862f910975d6668f443056cf22e6d66453b56f33 -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Sat Mar 21 18:13:58 2026 +1300
 
@@ -113,7 +113,7 @@ Date:   Sat Mar 21 18:13:58 2026 +1300
     
     - Made the run_catch_unwind method of the TaskActor implementation public.
 
-commit ac441e7aa1a17df71b351a24c15d026e2ceffae3
+commit ac441e7aa1a17df71b351a24c15d026e2ceffae3 -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Fri Mar 20 19:25:12 2026 +1300
 
@@ -125,7 +125,7 @@ Date:   Fri Mar 20 19:25:12 2026 +1300
     
     WIP
 
-commit 38a1aa88d78e1bfed890147c06ccd38fd234c603
+commit 38a1aa88d78e1bfed890147c06ccd38fd234c603 -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Mon Mar 16 16:05:44 2026 +1300
 
@@ -141,7 +141,7 @@ Date:   Mon Mar 16 16:05:44 2026 +1300
     
     - Added the impl_mac_task_actor_flexible and impl_mac_task_actor_with_state_builder_flexible macros.
 
-commit 95bc72d87db73390e8e9ce62cea70d85a3209080
+commit 95bc72d87db73390e8e9ce62cea70d85a3209080 -
 Author: Paul Saunders <coruscateor@users.noreply.github.com>
 Date:   Sat Mar 14 18:08:49 2026 +1300
 

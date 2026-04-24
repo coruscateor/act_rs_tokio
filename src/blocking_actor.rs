@@ -38,7 +38,7 @@ impl BlockingActor
     ///
     /// Spawn a new actor and construct its state with the provided state builder in its thread.
     /// 
-    pub fn spawn_and_build<ST, STB>(state_builder: STB) -> JoinHandle<()>
+    pub fn spawn_and_build_state<ST, STB>(state_builder: STB) -> JoinHandle<()>
         where ST: ActorState + Send + 'static,
               STB: ActorStateBuilder<ST> + Send + 'static
     {
@@ -85,7 +85,7 @@ impl BlockingActor
 
     }
 
-    pub fn spawn_build_and_catch_unwind<ST, STB, F>(state_builder: STB, err_fn: &Arc<F>) -> JoinHandle<()>
+    pub fn spawn_build_state_and_catch_unwind<ST, STB, F>(state_builder: STB, err_fn: &Arc<F>) -> JoinHandle<()>
         where ST: ActorState + Send + 'static,
               STB: ActorStateBuilder<ST> + Send + UnwindSafe + 'static,
               F: Fn(Box<dyn Any + Send>) + Send + Sync + 'static
