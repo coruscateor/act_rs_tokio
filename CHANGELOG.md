@@ -35,13 +35,46 @@ commit ac441e7aa1a17df71b351a24c15d026e2ceffae3
 
 - Added the spawn_catch_unwind and spawn_build_state_and_catch_unwind methods to the BlockingActor implementation.
 
-Renamed - Added in this version.
+Added in this version.
 
 - Added the spawn_catch_unwind and run_catch_unwind methods to the TaskActor implementation.
 
 commit 38a1aa88d78e1bfed890147c06ccd38fd234c603
 
-- Added the impl_mac_task_actor_flexible and impl_mac_task_actor_with_state_builder_flexible macros.
+-- Added the impl_mac_task_actor_flexible and impl_mac_task_actor_with_state_builder_flexible macros.
+
+- Added the impl_task_actor_flexible and impl_task_actor_build_state_flexible macros.
+
+Renamed - Added in this version. impl_task_actor_flexible and impl_task_actor_build_state_flexible macros -
+
+commit 023fb3b78702fc93e98f2a2d4c04c71d822edd8d
+
+- Added the task_actor_build_state_with_spawn, task_actor_build_state_with_spawn_flexible, task_actor_build_state_with_spawn_catch_unwind, task_actor_build_state_with_spawn_flexible, task_actor_build_state_and_catch_unwind, task_actor_build_state_with_spawn_catch_unwind, task_actor_catch_unwind_flexible, task_actor_build_state_and_catch_unwind_flexible and task_actor_build_state_with_spawn_catch_unwind_flexible test functions to the task_actor_macro_tests module.
+
+- Added the impl_task_actor_build_state_with_spawn, impl_task_actor_build_state_with_spawn_flexible, impl_task_actor_build_state_with_spawn_catch_unwind,
+impl_task_actor_catch_unwind_flexible and impl_task_actor_build_state_with_spawn_catch_unwind_flexible macros.
+
+commit 88f7e0601c386cbf7a235d1efbfea9de6c1cdc67
+
+-- Added pastey to the package dev-dependencies section.
+
+- Added pastey to the package dev-dependencies section of the cargo.toml file.
+
+- Added the task_actor_macro_tests module with TestActorState, TestActorStateBuilder, TestActorFlowState, TestActorFlowStateBuilder, TestPaincHander structs, without_builder and with_builder functions and task_actor, task_actor_build_state, task_actor_flexible, task_actor_build_state_flexible and task_actor_catch_unwind test functions.
+
+commit 95bc72d87db73390e8e9ce62cea70d85a3209080
+
+-- Added a spawn_and_build method to the BlockingActor implementation.
+
+- Added the spawn_and_build_state method to the BlockingActor implementation.
+
+Renamed - Added in this version. - spawn_and_build_state - See Documentation
+
+-- Added a spawn_and_build method to the TaskActor implementation.
+
+- Added the spawn_and_build_state method to the TaskActor implementation.
+
+Renamed - Added in this version. - spawn_and_build_state -
 
 
 
@@ -131,19 +164,25 @@ commit 19e4350229e49532d1a43f890d12587481e4be4e
 
 Renamed from impl_mac_task_actor_built_state macro
 
+Renamed - Added in this version. - impl_task_actor_build_state -
+
 - Renamed the spawn_and_build meta-method definition to spawn_and_build_state in the impl_task_actor_build_state macro.
 
 - Renamed the impl_mac_task_actor_flexible macro to impl_task_actor_flexible.
 
-Renamed - Added in this version.
+Renamed - Added in this version. - impl_task_actor_flexible -
 
 -- Renamed the impl_mac_task_actor_with_state_builder_flexible macro to_task_actor_build_state_flexible.
 
-Renamed - Added in this version.
+-- Renamed the impl_mac_task_actor_with_state_builder_flexible macro to impl_task_actor_build_state_flexible.
+
+Renamed - Added in this version. - impl_task_actor_build_state_flexible -
 
 -- Renamed the spawn_and_build meta-method definition to spawn_and_build_state in the to_task_actor_build_state_flexible macro.
 
-Renamed - Added in this version.
+-- Renamed the spawn_and_build meta-method definition to spawn_and_build_state in the impl_task_actor_build_state_flexible macro.
+
+Added in this version.
 
 -- Removed the bool parameter of the err_fn closure parameter of the spawn_build_state_and_catch_unwind method of the TaskActor implementation.
 
@@ -153,7 +192,7 @@ commit 862f910975d6668f443056cf22e6d66453b56f33
 
 -- Renamed the spawn_and_build method to spawn_and_build_state in the TaskActor implementation.
 
-Renamed - Added in this version.
+Renamed - Added in this version. - spawn_and_build_state -
 
 -- Went with FnOnce for handling panic results in spawn_catch_unwind.
 
@@ -179,7 +218,9 @@ Added in this version.
 
 -- Renamed the impl_mac_task_actor_built_state macro to impl_mac_task_actor_with_state_builder and changed its spawn meta-function to take a type which has an name that ends with “state”. Also updated its run function to deal with “state types” in same way the other actor oriented macros and structs do and the spawn_and_build meta-method was also added to this macro declaration.
 
-Renamed - Added in this version.
+- Renamed the impl_mac_task_actor_built_state macro to impl_task_actor_build_state and updated its run function to deal with “state types” in same way the other actor oriented macros and structs do. The spawn_and_build_state meta-method was added and the spawn method was removed from this macro declaration.
+
+Renamed - Added in this version. - impl_task_actor_build_state -
 
 commit 95bc72d87db73390e8e9ce62cea70d85a3209080
 
@@ -194,37 +235,6 @@ commit 95bc72d87db73390e8e9ce62cea70d85a3209080
 commit 38a1aa88d78e1bfed890147c06ccd38fd234c603
 
 - Removed the runtime_enter, runtime_enter_param, runtime_enter_param_ref, runtime_enter_param_mut, handle_enter, handle_enter_param, handle_enter_param_ref and handle_enter_param_mut functions and some old code and comments from the entering module.
-
-### Added
-
-commit 023fb3b78702fc93e98f2a2d4c04c71d822edd8d
-
-- Added the task_actor_build_state_with_spawn, task_actor_build_state_with_spawn_flexible, task_actor_build_state_with_spawn_catch_unwind, task_actor_build_state_with_spawn_flexible, task_actor_build_state_and_catch_unwind, task_actor_build_state_with_spawn_catch_unwind, task_actor_catch_unwind_flexible, task_actor_build_state_and_catch_unwind_flexible and task_actor_build_state_with_spawn_catch_unwind_flexible test functions to the task_actor_macro_tests module.
-
-- Added the impl_task_actor_build_state_with_spawn, impl_task_actor_build_state_with_spawn_flexible, impl_task_actor_build_state_with_spawn_catch_unwind,
-impl_task_actor_catch_unwind_flexible and impl_task_actor_build_state_with_spawn_catch_unwind_flexible macros.
-
-commit 88f7e0601c386cbf7a235d1efbfea9de6c1cdc67
-
--- Added pastey to the package dev-dependencies section.
-
-- Added pastey to the package dev-dependencies section of the cargo.toml file.
-
-- Added the task_actor_macro_tests module with TestActorState, TestActorStateBuilder, TestActorFlowState, TestActorFlowStateBuilder, TestPaincHander structs, without_builder and with_builder functions and task_actor, task_actor_build_state, task_actor_flexible, task_actor_build_state_flexible and task_actor_catch_unwind test functions.
-
-commit 95bc72d87db73390e8e9ce62cea70d85a3209080
-
--- Added a spawn_and_build method to the BlockingActor implementation.
-
-- Added the spawn_and_build_state method to the BlockingActor implementation.
-
-Renamed - Added in this version.
-
--- Added a spawn_and_build method to the TaskActor implementation.
-
-- Added the spawn_and_build_state method to the TaskActor implementation.
-
-Renamed - Added in this version.
 
 
 
