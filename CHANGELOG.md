@@ -68,13 +68,19 @@ commit 95bc72d87db73390e8e9ce62cea70d85a3209080
 
 - Added the spawn_and_build_state method to the BlockingActor implementation.
 
-Renamed - Added in this version. - spawn_and_build_state - See Documentation
+Renamed - Added in this version. - spawn_and_build_state, BlockingActor -
 
 -- Added a spawn_and_build method to the TaskActor implementation.
 
 - Added the spawn_and_build_state method to the TaskActor implementation.
 
 Renamed - Added in this version. - spawn_and_build_state -
+
+commit 708272418628f88bc012dafb71c82e1d8621e8b4
+
+- Renamed the spawn_and_build method to spawn_and_build_state and the spawn_build_and_catch_unwind method to spawn_build_state_and_catch_unwind in the BlockingActor implementation.
+
+Renamed - Added in this version. - spawn_and_build_state, spawn_build_state_and_catch_unwind, BlockingActor -
 
 
 
