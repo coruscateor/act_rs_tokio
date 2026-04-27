@@ -26,10 +26,10 @@ futures = { version = "0.3.32", optional = true }
 async-trait = ["act_rs/async-trait"]
 
 [dev-dependencies]
-pastey = "0.2.1"
+pastey = "0.2.2"
 
 #catch_unwind = ["futures"]
 
-#[package.metadata.docs.rs]
-#all-features = true
-#rustdoc-args = ["--cfg", "docsrs"]
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

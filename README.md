@@ -31,15 +31,17 @@ An actor is an object that runs in its own thread or task. You would usually com
 
 You can also create task based actors:
 
-This crate uses types from [act_rs](https://crates.io/crates/act_rs).
+This crate uses types from [Act.rs](https://crates.io/crates/act_rs).
 
-See also: [act_rs_smol](https://crates.io/crates/act_rs_smol)
+See also: [Act.rs smol](https://crates.io/crates/act_rs_smol)
 
 <br />
 
-## A Basic Example
+## An Example
 
 Here's the first example in the Act.rs readme adapted to implement a macro generated actor:
+
+<br />
 
 ```rust
 
@@ -136,7 +138,7 @@ Here's the first example in the Act.rs readme adapted to implement a macro gener
 
 - [Escape It](https://github.com/coruscateor/escape_it/blob/latest/src/conversion_actor.rs)
 
-- [Act.rs Async Traits Test](https://github.com/coruscateor/act_rs_async_traits_test/tree/latest)
+- [Mapage](https://github.com/coruscateor/mapage)
 
 - [Mapage Types Viewer](https://github.com/coruscateor/mapage_types_viewer)
 
