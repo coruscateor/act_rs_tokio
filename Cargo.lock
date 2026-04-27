@@ -13,7 +13,7 @@ dependencies = [
 
 [[package]]
 name = "act_rs_tokio"
-version = "0.2.0-beta"
+version = "0.2.0"
 dependencies = [
  "act_rs",
  "futures",
