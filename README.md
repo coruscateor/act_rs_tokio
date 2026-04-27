@@ -134,9 +134,9 @@ Here's the first example in the Act.rs readme adapted to implement a macro gener
 
 ## Examples
 
-- [Req It](https://github.com/coruscateor/req_it/blob/latest/src/actors/graphql_actor.rs)
+- [Req It](https://github.com/coruscateor/req_it)
 
-- [Escape It](https://github.com/coruscateor/escape_it/blob/latest/src/conversion_actor.rs)
+- [Escape It](https://github.com/coruscateor/escape_it)
 
 - [Mapage](https://github.com/coruscateor/mapage)
 
